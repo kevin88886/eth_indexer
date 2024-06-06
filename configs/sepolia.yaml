@@ -1,0 +1,33 @@
+server:
+  http:
+    addr: 0.0.0.0:12300
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:12301
+    timeout: 1s
+data:
+  database:
+    driver: mysql
+    #  日志等级. 默认 silent
+    #  1. silent
+    #  2. error
+    #  3. warn
+    #  4. info
+    log_level: 4
+    source: "root:123456@(127.0.0.1:3306)/ierc_sepolia_indexer?charset=utf8mb4&parseTime=True&loc=Local"
+
+  ethereum:
+    endpoints:
+      - https://rpc2.sepolia.org
+#      - https://rpc.sepolia.org
+#      - "https://sepolia.infura.io/v3/d49aedc5c8d04128ab366779756cfacd"
+
+runtime:
+  enable_sync: true
+  # 同步拉取区块的线程数
+  sync_threads_num: 10
+  sync_start_block: 5044966
+  enable_handle: true
+#  handle_end_block: 5071641
+  handle_queue_size: 10
+  invalid_tx_hash_path: ./configs/sepolia_invalid_tx_hash.json

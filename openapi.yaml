@@ -1,0 +1,420 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: Indexer API
+    version: 0.0.1
+paths:
+    /api/v2/index/check_transfer:
+        get:
+            tags:
+                - Indexer
+            operationId: Indexer_CheckTransfer
+            parameters:
+                - name: hash
+                  in: query
+                  schema:
+                    type: string
+                - name: positionIndex
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.indexer.CheckTransferReply'
+    /api/v2/index/events:
+        get:
+            tags:
+                - Indexer
+            description: 订阅事件
+            operationId: Indexer_QueryEvents
+            parameters:
+                - name: startBlock
+                  in: query
+                  description: 从哪个区块开始订阅
+                  schema:
+                    type: string
+                - name: size
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.indexer.QueryEventsReply'
+    /api/v2/index/status:
+        get:
+            tags:
+                - Indexer
+            description: 查询 索引状态
+            operationId: Indexer_QuerySystemStatus
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.indexer.QuerySystemStatusReply'
+components:
+    schemas:
+        api.indexer.CheckTransferReply:
+            type: object
+            properties:
+                data:
+                    $ref: '#/components/schemas/api.indexer.CheckTransferReply_TransferRecord'
+        api.indexer.CheckTransferReply_TransferRecord:
+            type: object
+            properties:
+                sender:
+                    type: string
+                receiver:
+                    type: string
+                tick:
+                    type: string
+                amount:
+                    type: string
+                status:
+                    type: boolean
+        api.indexer.Event:
+            type: object
+            properties:
+                blockNumber:
+                    type: string
+                    description: 事件发生时在哪个以太坊区块上
+                txHash:
+                    type: string
+                    description: 事件发生时在哪笔以太坊交易中
+                posInIercTxs:
+                    type: integer
+                    description: 事件发生在 IERC协议 交易中的哪个位置
+                    format: int32
+                from:
+                    type: string
+                    description: 交易发起者
+                to:
+                    type: string
+                    description: 交易接受者
+                value:
+                    type: string
+                    description: ETH value
+                eventAt:
+                    type: string
+                    description: 事件发生时间. 毫秒级时间戳
+                errCode:
+                    type: integer
+                    description: |-
+                        ========== 事件状态 ==========
+                         错误码. 划转失败时携带
+                    format: int32
+                errReason:
+                    type: string
+                    description: 错误原因. 划转失败时携带
+                tickCreated:
+                    allOf:
+                        - $ref: '#/components/schemas/api.indexer.IERC20TickCreated'
+                    description: ierc20 tick
+                minted:
+                    $ref: '#/components/schemas/api.indexer.IERC20Minted'
+                powTickCreated:
+                    allOf:
+                        - $ref: '#/components/schemas/api.indexer.IERCPoWTickCreated'
+                    description: ierc_pow
+                powMinted:
+                    $ref: '#/components/schemas/api.indexer.IERCPoWMinted'
+                tickTransferred:
+                    allOf:
+                        - $ref: '#/components/schemas/api.indexer.TickTransferred'
+                    description: ierc20 & ierc_pow & staking
+                poolUpdated:
+                    allOf:
+                        - $ref: '#/components/schemas/api.indexer.StakingPoolUpdated'
+                    description: staking
+        api.indexer.IERC20Minted:
+            type: object
+            properties:
+                protocol:
+                    type: string
+                    description: 协议类型
+                operate:
+                    type: integer
+                    description: 操作类型
+                    format: enum
+                tick:
+                    type: string
+                    description: ierc20 tick
+                from:
+                    type: string
+                    description: 付款人. ETH地址
+                to:
+                    type: string
+                    description: 收款人. ETH地址
+                nonce:
+                    type: string
+                    description: 随机数
+                mintedAmount:
+                    type: string
+                    description: mint 的数量
+                gas:
+                    type: string
+                    description: 消耗的gas
+                gasPrice:
+                    type: string
+        api.indexer.IERC20TickCreated:
+            type: object
+            properties:
+                protocol:
+                    type: string
+                    description: 协议
+                operate:
+                    type: integer
+                    description: 操作类型
+                    format: enum
+                tick:
+                    type: string
+                    description: tick 名称
+                decimals:
+                    type: string
+                    description: 精度
+                maxSupply:
+                    type: string
+                    description: 最大发行量
+                limit:
+                    type: string
+                    description: 一个地址在一个区块中的挖矿上限
+                walletLimit:
+                    type: string
+                    description: 一个地址的挖矿上限
+                workc:
+                    type: string
+                    description: 挖矿难度
+                creator:
+                    type: string
+                    description: 部署者
+                nonce:
+                    type: string
+                    description: nonce
+            description: IERC20 Tick 创建事件
+        api.indexer.IERCPoWMinted:
+            type: object
+            properties:
+                protocol:
+                    type: string
+                    description: 协议类型. 冗余字段
+                operate:
+                    type: integer
+                    description: 操作类型, mint\transfer\freeze_sell\unfreeze_sell\proxy_transfer
+                    format: enum
+                tick:
+                    type: string
+                    description: ierc20 tick
+                from:
+                    type: string
+                    description: 付款人. ETH地址
+                to:
+                    type: string
+                    description: 收款人. ETH地址
+                nonce:
+                    type: string
+                    description: 随机数
+                isPow:
+                    type: boolean
+                    description: pow 相关
+                powTotalShare:
+                    type: string
+                powMinerShare:
+                    type: string
+                powMintedAmount:
+                    type: string
+                isPos:
+                    type: boolean
+                    description: pos 相关
+                posTotalShare:
+                    type: string
+                posMinerShare:
+                    type: string
+                posMintedAmount:
+                    type: string
+                gas:
+                    type: string
+                gasPrice:
+                    type: string
+                isAirdrop:
+                    type: boolean
+                    description: 空投相关
+                airdropAmount:
+                    type: string
+                burnedAmount:
+                    type: string
+                    description: 销毁相关. 暂时用不上
+        api.indexer.IERCPoWTickCreated:
+            type: object
+            properties:
+                protocol:
+                    type: string
+                    description: 协议类型. 冗余字段
+                operate:
+                    type: integer
+                    description: 操作类型
+                    format: enum
+                tick:
+                    type: string
+                    description: ierc20 tick
+                decimals:
+                    type: string
+                maxSupply:
+                    type: string
+                tokenomicsDetails:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.indexer.IERCPoWTickCreated_TokenomicsDetail'
+                rule:
+                    $ref: '#/components/schemas/api.indexer.IERCPoWTickCreated_Rule'
+                creator:
+                    type: string
+        api.indexer.IERCPoWTickCreated_Rule:
+            type: object
+            properties:
+                powRatio:
+                    type: string
+                minWorkc:
+                    type: string
+                difficultyRatio:
+                    type: string
+                posRatio:
+                    type: string
+                posPool:
+                    type: string
+        api.indexer.IERCPoWTickCreated_TokenomicsDetail:
+            type: object
+            properties:
+                blockNumber:
+                    type: string
+                amount:
+                    type: string
+        api.indexer.QueryEventsReply:
+            type: object
+            properties:
+                eventByBlocks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.indexer.QueryEventsReply_EventsByBlock'
+        api.indexer.QueryEventsReply_EventsByBlock:
+            type: object
+            properties:
+                blockNumber:
+                    type: string
+                    description: 区块号
+                prevBlockNumber:
+                    type: string
+                    description: 上一个有事件发生的区块. 客户端用于检验是否有区块缺失的情况
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.indexer.Event'
+                    description: 这个区块上发生的事件
+        api.indexer.QuerySystemStatusReply:
+            type: object
+            properties:
+                syncBlock:
+                    type: string
+                    description: 当前系统同步高度
+        api.indexer.StakingPoolUpdated:
+            type: object
+            properties:
+                protocol:
+                    type: string
+                    description: 协议类型. 冗余字段
+                operate:
+                    type: integer
+                    description: 操作类型
+                    format: enum
+                from:
+                    type: string
+                    description: 交易发起人. ETH地址
+                to:
+                    type: string
+                    description: 交易接收者. ETH地址
+                pool:
+                    type: string
+                    description: 质押池
+                poolId:
+                    type: string
+                    description: 质押池ID
+                name:
+                    type: string
+                    description: 质押池名称
+                owner:
+                    type: string
+                    description: 质押池拥有者
+                admins:
+                    type: array
+                    items:
+                        type: string
+                    description: 质押池管理者
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.indexer.StakingPoolUpdated_TickConfigDetail'
+                    description: 质押池配置
+                stopBlock:
+                    type: string
+                    description: 到期区块
+        api.indexer.StakingPoolUpdated_TickConfigDetail:
+            type: object
+            properties:
+                tick:
+                    type: string
+                ratio:
+                    type: string
+                maxAmount:
+                    type: string
+        api.indexer.TickTransferred:
+            type: object
+            properties:
+                protocol:
+                    type: string
+                    description: 协议类型. 冗余字段
+                operate:
+                    type: integer
+                    description: 操作类型, mint\transfer\freeze_sell\unfreeze_sell\proxy_transfer
+                    format: enum
+                tick:
+                    type: string
+                    description: ierc20 tick
+                from:
+                    type: string
+                    description: 付款人. ETH地址
+                to:
+                    type: string
+                    description: 收款人. ETH地址
+                amount:
+                    type: string
+                    description: 划转数量. 浮点字符串
+                ethValue:
+                    type: string
+                    description: |-
+                        ========= freeze_sell、unfreeze_sell、proxy_transfer 数据 =========
+                         ETH 数量. 浮点字符串
+                gasPrice:
+                    type: string
+                    description: ETH 价格. 浮点字符串
+                signerNonce:
+                    type: string
+                    description: |-
+                        签名者 nonce. 主要用于校验签名
+                         - freeze_sell 时, to 是签名者
+                         - proxy_transfer 时, from 是签名者
+                sign:
+                    type: string
+                    description: 签名
+            description: IERC20 Tick 划转事件
+tags:
+    - name: Indexer

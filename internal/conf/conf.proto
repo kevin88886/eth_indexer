@@ -1,0 +1,76 @@
+syntax = "proto3";
+package config;
+
+option go_package = "github.com/kevin88886/eth_indexer/internal/conf;conf";
+
+import "google/protobuf/duration.proto";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+  Runtime runtime = 3;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+}
+
+message Data {
+  message Database {
+    string driver = 1;
+    string source = 2;
+    // 日志等级. 默认 silent
+    // 1. silent
+    // 2. error
+    // 3. warn
+    // 4. info
+    int64 log_level = 3;
+    // 最大空闲连接数. 默认: 10
+    int64 max_idle_conns = 4;
+    // 最大活动连接数. 默认: 100
+    int64 max_open_conns = 5;
+    // 连接最大存活时间. 默认: 300s
+    google.protobuf.Duration conn_max_lifetime = 6;
+  }
+
+  message Ethereum {
+    repeated string endpoints = 1;
+    int64 nums = 2; //
+  }
+
+  Database database = 1;
+  Ethereum ethereum = 2;
+  Runtime runtime = 3;
+}
+
+// 运行时配置
+message Runtime {
+  // 启动同步区块功能
+  bool enable_sync = 1;
+  // 索引起始块
+  uint64 sync_start_block = 2;
+  // 同步线程数量
+  uint64 sync_threads_num = 3;
+  // 启动处理交易
+  bool enable_handle = 4;
+
+  // 处理结束区块
+  uint64 handle_end_block = 5;
+  // 处理队列大小
+  int64 handle_queue_size = 6;
+  // 无效交易hash列表json文件
+  string invalid_tx_hash_path = 7;
+  // 开始收服务费的区块号
+  uint64 fee_start_block = 8;
+}

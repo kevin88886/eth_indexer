@@ -1,0 +1,41 @@
+server:
+  http:
+    addr: 0.0.0.0:12300
+    timeout: 30s
+  grpc:
+    addr: 0.0.0.0:12301
+    timeout: 1s
+data:
+  database:
+    driver: mysql
+    #  日志等级. 默认 silent
+    #  1. silent
+    #  2. error
+    #  3. warn
+    #  4. info
+    log_level: 2
+    source: "root:123456@(127.0.0.1:3306)/main_indexer?charset=utf8mb4&parseTime=True&loc=Local"
+
+  ethereum:
+    endpoints:
+#      - "https://mainnet.infura.io/v3/366b112c82e94e9584e3172cca64429f"
+      - "https://eth-mainnet.g.alchemy.com/v2/-rIumiy2LiQVCU_y5x9yseO9JjEMPXDX"
+#      - "http://95.217.250.133"
+#      - http://3.80.146.8:8545
+
+runtime:
+  # 是否开启同步
+  enable_sync: false
+  # 同步拉取区块的线程数
+  sync_threads_num: 5
+  # 从哪个块开始索引
+  sync_start_block: 17598250
+  # 是否启动处理
+  enable_handle: true
+  # 处理到哪个块就结束
+#  handle_end_block: 19059466
+  # 处理队列大小
+  handle_queue_size: 1000
+  # 无效交易hash文件
+  invalid_tx_hash_path: ./configs/invalid_tx_hash.json
+  fee_start_block: 18810822
